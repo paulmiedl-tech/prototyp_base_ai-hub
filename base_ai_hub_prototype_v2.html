@@ -70,48 +70,6 @@ input, select, textarea { font-family: inherit; color: inherit; }
 a { color: var(--base-green-2); text-decoration: none; }
 img { max-width: 100%; display: block; }
 
-/* ============ Password gate ============ */
-.pw-gate {
-  position: fixed; inset: 0; z-index: 999;
-  display: flex; align-items: center; justify-content: center;
-  padding: 24px 18px;
-  background:
-    radial-gradient(circle at 15% 20%, rgba(106,143,63,.14), transparent 55%),
-    radial-gradient(circle at 85% 80%, rgba(156,200,228,.18), transparent 55%),
-    linear-gradient(180deg, #FBFCFC 0%, #F2F6EA 100%);
-}
-.pw-gate.hidden { display: none; }
-.pw-card {
-  width: 100%; max-width: 400px;
-  background: #fff; border: 1px solid var(--line);
-  border-radius: 20px; padding: 32px 28px 26px;
-  box-shadow: 0 2px 4px rgba(15,26,28,.04), 0 24px 64px rgba(15,26,28,.14);
-  display: flex; flex-direction: column; align-items: stretch; gap: 10px;
-  animation: pw-in .28s cubic-bezier(.2,.8,.2,1);
-}
-@keyframes pw-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-.pw-card .base-logo.lg { align-self: flex-start; margin-bottom: 2px; }
-.pw-card h1 { margin: 6px 0 4px; font-size: 22px; letter-spacing: -.3px; font-weight: 800; }
-.pw-card p  { margin: 0 0 14px; color: var(--muted); font-size: 14px; line-height: 1.5; }
-.pw-field   { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
-.pw-field .pw-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .4px; text-transform: uppercase; }
-.pw-field input {
-  padding: 12px 14px; border: 1.5px solid var(--line); border-radius: 11px;
-  font-size: 15px; outline: none; background: #fff; font-weight: 500; color: var(--ink);
-  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
-  width: 100%;
-}
-.pw-field input:focus {
-  border-color: var(--base-green);
-  box-shadow: 0 0 0 4px rgba(106,143,63,.14);
-}
-.pw-card .pw-error {
-  font-size: 12.5px; color: var(--danger); font-weight: 600;
-  background: var(--danger-soft); padding: 8px 12px; border-radius: 10px;
-  margin: 4px 0 2px;
-}
-.pw-card .btn-primary { margin-top: 6px; }
-body.pw-locked { overflow: hidden; }
 
 /* ============ BASE Logo (reusable SVG-like) ============ */
 .base-logo {
@@ -2554,21 +2512,6 @@ html, body { overflow-x: hidden; }
 </head>
 <body>
 
-<!-- ============ Password gate (full-screen) ============ -->
-<div class="pw-gate" id="password-gate" role="dialog" aria-modal="true" aria-labelledby="pw-title">
-  <div class="pw-card">
-    <span class="base-logo lg">BASE</span>
-    <h1 id="pw-title">AI Hub</h1>
-    <p>Bitte Passwort eingeben, um fortzufahren.</p>
-    <label class="pw-field">
-      <span class="pw-label">Passwort</span>
-      <input type="password" id="pw-input" autocomplete="current-password" spellcheck="false" autofocus />
-    </label>
-    <div class="pw-error" id="pw-error" hidden>Falsches Passwort</div>
-    <button class="btn btn-primary btn-block btn-lg" id="pw-submit">Entsperren</button>
-  </div>
-</div>
-
 <!-- ============ App root ============ -->
 <div id="app-root"><!-- content injected by render() --></div>
 
@@ -4910,43 +4853,6 @@ function flashWallet(tokens) {
     chip.appendChild(delta);
     setTimeout(() => delta.remove(), 1300);
   });
-}
-
-/* =========================================================
-   PASSWORD GATE (frontend-only, session-persistent)
-   ========================================================= */
-const PW_EXPECTED = '2026-base';
-const PW_KEY = 'base_unlocked_v1';
-const pwGate   = document.getElementById('password-gate');
-const pwInput  = document.getElementById('pw-input');
-const pwError  = document.getElementById('pw-error');
-const pwSubmit = document.getElementById('pw-submit');
-
-function unlock() {
-  sessionStorage.setItem(PW_KEY, '1');
-  if (pwGate) pwGate.classList.add('hidden');
-  document.body.classList.remove('pw-locked');
-}
-function trySubmitPw() {
-  if (!pwInput) return;
-  if (pwInput.value === PW_EXPECTED) {
-    pwError.hidden = true;
-    unlock();
-  } else {
-    pwError.hidden = false;
-    pwInput.value = '';
-    pwInput.focus();
-  }
-}
-if (pwSubmit) pwSubmit.addEventListener('click', trySubmitPw);
-if (pwInput)  pwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); trySubmitPw(); } });
-
-// Initial state: locked unless previously unlocked in this tab session
-if (sessionStorage.getItem(PW_KEY) === '1') {
-  if (pwGate) pwGate.classList.add('hidden');
-} else {
-  document.body.classList.add('pw-locked');
-  if (pwInput) setTimeout(() => pwInput.focus(), 50);
 }
 
 /* =========================================================

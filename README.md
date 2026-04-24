@@ -6,10 +6,6 @@ Single-file HTML prototype of a wallet-based multi-model AI platform. Users load
 
 Open `base_ai_hub_prototype_v2.html` in any modern browser. No build step, no dependencies.
 
-## Access
-
-A frontend password gate protects the prototype. Default password: `2026-base`.
-
 ## What's inside
 
 - Public landing: hero, tools, discovery use cases, pricing, footer.
@@ -20,6 +16,9 @@ A frontend password gate protects the prototype. Default password: `2026-base`.
 
 ## Deploy to Vercel
 
-1. Import this repo into Vercel (no framework preset required — static site).
-2. `vercel.json` rewrites `/` to `base_ai_hub_prototype_v2.html`, so the root URL serves the prototype directly.
-3. Add security headers (`X-Content-Type-Options`, `Referrer-Policy`) and a no-cache policy on the HTML so updates ship immediately.
+1. Import this repo into Vercel (Framework preset: **Other**, no build).
+2. `vercel.json` rewrites `/` → `base_ai_hub_prototype_v2.html`.
+3. Protect the preview with **Vercel Deployment Protection**:
+   - Project Settings → **Deployment Protection** → **Password Protection** → set a password.
+   - Visitors will see Vercel's own password prompt before the page loads. The password is stored server-side and never reaches the browser.
+   - Note: Password Protection requires a **Pro** plan. On the Hobby plan, use Vercel Edge Middleware (server-side Basic Auth with a password stored in an env var) as a free alternative.
