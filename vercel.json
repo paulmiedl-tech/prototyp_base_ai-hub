@@ -1,8 +1,5 @@
 {
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/", "destination": "/base_ai_hub_prototype_v2.html" }
-  ],
+  "cleanUrls": false,
   "headers": [
     {
       "source": "/(.*)",
@@ -12,7 +9,13 @@
       ]
     },
     {
-      "source": "/base_ai_hub_prototype_v2.html",
+      "source": "/index.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
       ]
