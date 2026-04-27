@@ -2508,6 +2508,251 @@ html, body { overflow-x: hidden; }
   .devicebar .meta { display: none; }
   .devicebar .mode button { padding: 6px 12px; font-size: 11px; }
 }
+
+/* =========================================================
+   MOBILE REFINEMENT — final polish layer
+   Targets: iOS zoom, safe-area, touch targets, overlap with
+   the fixed bottom-nav, modal stacking on narrow screens,
+   trust/footer wrapping, and a few typography tweaks.
+   ========================================================= */
+
+/* Smooth momentum scrolling everywhere on touch */
+html { -webkit-text-size-adjust: 100%; }
+
+/* Remove the iOS blue tap-highlight; use a brand-aligned wash instead */
+* { -webkit-tap-highlight-color: rgba(106,143,63,.12); }
+button, a, [role="button"], .nav-item, .model-chip, .chip,
+.preset, .pay, .sso-btn, .brand-opt, .topup-type-tabs button,
+.wh-tabs button, .auth-tabs button, .info-btn, .lang-btn, .close,
+.discovery-card, .app-tool-card, .tool-card, .chat-thread,
+.session-group .sg-head, .dc-mini, .bottom-nav button {
+  touch-action: manipulation;
+}
+
+/* iOS Safari only avoids auto-zoom-on-focus when input font-size >= 16px.
+   Bump every text input/textarea on mobile so opening the keyboard never
+   reflows the layout. */
+@media (max-width: 900px) {
+  .input-wrap input,
+  .login-form input,
+  .composer textarea,
+  .chat-card .composer textarea,
+  .recurring-box .rb-inline input,
+  .amt-input input,
+  textarea,
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"] {
+    font-size: 16px;
+  }
+}
+.mobile .composer textarea,
+.mobile .chat-card .composer textarea,
+.mobile .main-chat .composer textarea { font-size: 16px; line-height: 1.45; }
+.mobile .input-wrap input { font-size: 16px; padding-top: 26px; }
+.mobile .recurring-box .rb-inline input { font-size: 16px; padding: 9px 10px 9px 24px; }
+
+/* ---- Fixed bottom-nav: safe-area aware + sit above content cleanly ---- */
+.bottom-nav {
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -1px 0 var(--line);
+}
+.mobile .bottom-nav {
+  padding: 6px 6px calc(10px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Make the auth shell take the full viewport on mobile so flex-based chat
+   layout (composer pinned to bottom) actually has a height to fill. */
+.mobile .auth-wrap { min-height: 100vh; min-height: 100dvh; }
+
+/* Reserve room beneath every authed page so the fixed bottom-nav never
+   covers content. Chat overrides this to host the composer flush above
+   the nav. */
+.mobile .main { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+.mobile .main-chat {
+  padding: 0 0 calc(70px + env(safe-area-inset-bottom, 0px));
+  min-height: 0;
+}
+.mobile .main-chat .composer { padding-bottom: 12px; }
+
+/* Hero visual on mobile shouldn't be a fixed empty 380px box — the
+   wallet preview card should determine its own height. */
+.mobile .hero-vis { height: auto; min-height: 0; padding: 0; }
+@media (max-width: 900px) { .hero-vis { height: auto; min-height: 0; } }
+
+/* Page-head wraps with the right-side action below the title on narrow */
+.mobile .page-head { gap: 10px; align-items: flex-start; }
+.mobile .page-head > .btn,
+.mobile .page-head > .price-tag { align-self: flex-start; flex-shrink: 0; }
+
+/* Ensure consistent minimum touch target heights */
+.mobile .btn-sm { min-height: 38px; }
+.mobile .wh-tabs button,
+.mobile .auth-tabs button,
+.mobile .topup-type-tabs button { min-height: 40px; }
+
+/* Suggestions on chat: keep horizontal scroll smooth and snappy on touch */
+.mobile .suggestions {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 12px;
+}
+.mobile .suggestions .chip { scroll-snap-align: start; min-height: 36px; }
+.mobile .suggestions .chip,
+.mobile .main-chat .suggestions .chip { padding: 8px 14px; font-size: 12.5px; }
+
+/* Chat empty state — friendlier proportions on small phones */
+.mobile .chat-empty-state { padding: 20px 16px 8px; gap: 10px; }
+.mobile .chat-empty-state .ces-mark { width: 48px; height: 48px; font-size: 24px; border-radius: 14px; }
+.mobile .chat-empty-state h4 { font-size: 16px; }
+.mobile .chat-empty-state p { font-size: 12.5px; line-height: 1.5; }
+
+/* Discovery cards: comfortable padding and clearer arrow target */
+.mobile .discovery-card { padding: 14px 14px 13px; gap: 6px; }
+.mobile .discovery-card .dc-icon { width: 34px; height: 34px; font-size: 16px; }
+.mobile .discovery-card h5 { font-size: 14px; padding-right: 32px; }
+.mobile .discovery-card p { font-size: 12.5px; line-height: 1.45; }
+.mobile .discovery-card::after { width: 24px; height: 24px; right: 12px; top: 12px; }
+
+/* Trust bar: stack the label above the logos when there isn't room */
+@media (max-width: 520px) {
+  .trust-inner { gap: 14px; flex-direction: column; align-items: center; text-align: center; }
+  .trust-logos { gap: 14px; justify-content: center; row-gap: 12px; }
+  .trust-bar { padding: 18px 16px; }
+}
+
+/* Hero CTAs span full width on tiny phones for confident tap targets */
+@media (max-width: 380px) {
+  .hero .cta-row { flex-direction: column; align-items: stretch; }
+  .hero .cta-row .btn { width: 100%; }
+}
+
+/* Footer: keep 2 columns but let the brand block span both rows on tiny */
+@media (max-width: 520px) {
+  .footer { grid-template-columns: 1fr 1fr; gap: 22px; }
+  .footer .about { grid-column: 1 / -1; }
+  .footer .about p { max-width: 100%; }
+}
+
+/* Pricing example rows: prevent overflow + readable cost on tiny screens */
+.mobile .pricing-row { gap: 10px; padding: 12px 0; }
+.mobile .pricing-row .left { min-width: 0; flex: 1; }
+.mobile .pricing-row .name { font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mobile .pricing-row .meta { font-size: 11.5px; }
+.mobile .pricing-row .cost { font-size: 13.5px; white-space: nowrap; flex-shrink: 0; }
+
+/* CTA banner: a touch tighter on small phones, no horizontal overflow */
+.mobile .cta-banner { margin: 0 14px; padding: 28px 20px; }
+.mobile .cta-banner .row { gap: 8px; }
+.mobile .cta-banner .row .btn { flex: 1 1 auto; min-width: 0; }
+
+/* Dashboard CTA actions tap-friendly on a single row that wraps */
+.mobile .chat-cta .cc-actions .btn { min-height: 42px; }
+
+/* App tool grid: make the foot row breathe on dense phones */
+.mobile .app-tool-card { padding: 14px; gap: 8px; }
+.mobile .app-tool-card .ic-wrap { width: 38px; height: 38px; font-size: 18px; border-radius: 11px; }
+.mobile .app-tool-card .foot { padding-top: 8px; gap: 6px; }
+.mobile .info-btn { width: 28px; height: 28px; top: 8px; right: 8px; }
+
+/* Modal backdrop: respect the bottom safe area so the close button isn't
+   covered by the iPhone home indicator on a tall scroll */
+.modal-backdrop {
+  padding: 24px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Modal polish for narrow phones */
+@media (max-width: 520px) {
+  .modal { padding: 22px 18px; border-radius: 18px; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); }
+  .modal h3 { font-size: 18px; }
+  .modal .hint { font-size: 13px; margin-bottom: 14px; }
+  .modal .close { top: 12px; right: 12px; width: 32px; height: 32px; }
+  .modal-actions { flex-direction: column-reverse; gap: 8px; }
+  .modal-actions .btn { width: 100%; }
+  .sso-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sso-btn { padding: 12px; min-height: 48px; font-size: 13px; }
+  .preset-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .preset { padding: 14px 10px; min-height: 48px; font-size: 15px; }
+  .pay { padding: 14px 12px; min-height: 56px; gap: 10px; }
+  .pay .pm-ic { width: 40px; height: 26px; font-size: 11px; }
+  .topup-type-tabs button { padding: 11px; min-height: 42px; font-size: 13px; }
+  .recurring-box { padding: 12px; }
+  .recurring-box .rb-row { font-size: 13px; gap: 6px; }
+  .recurring-box .rb-inline { width: 84px; }
+  .amt-input input { font-size: 18px; padding: 14px 14px 14px 38px; }
+  .auth-divider { margin: 14px 0; font-size: 10.5px; }
+  .login-form { gap: 10px; }
+  .input-wrap input { padding: 24px 14px 10px; }
+  .input-wrap .lbl-in { left: 14px; top: 10px; }
+}
+
+/* Tool-info modal: stack tier rows on very narrow widths */
+@media (max-width: 420px) {
+  #tool-info-modal .ti-head { flex-wrap: wrap; }
+  #tool-info-modal .ti-price { margin-left: 0; }
+  #tool-info-modal .ti-tier-row {
+    grid-template-columns: auto 1fr;
+    row-gap: 4px;
+    column-gap: 8px;
+    padding: 6px 0;
+  }
+  #tool-info-modal .ti-tier-cost { grid-column: 1 / -1; text-align: left; padding-left: 2px; }
+}
+
+/* Slim native scrollbars for touch devices */
+@media (pointer: coarse) {
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-thumb { background: #C7CED1; }
+}
+
+/* Toasts: keep them inside the safe area and away from the bottom-nav */
+.toast-wrap {
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+}
+.mobile .toast-wrap {
+  left: 12px; right: 12px; bottom: calc(82px + env(safe-area-inset-bottom, 0px));
+}
+.mobile .toast { min-width: 0; width: 100%; }
+
+/* Header: respect the iOS notch/status bar in PWA / fullscreen mode without
+   shrinking the comfortable top padding the design already uses. */
+.mobile .header { padding-top: max(26px, calc(10px + env(safe-area-inset-top, 0px))); }
+
+/* Headline sizing for narrow phones — keep long German compounds inside
+   the viewport. The original .mobile rules wedge against @media breakpoints
+   and lose; clamp them here instead. */
+@media (max-width: 520px) {
+  .mobile .hero h1 { font-size: 30px; letter-spacing: -.6px; }
+  .mobile .section-head h2 { font-size: 24px; letter-spacing: -.4px; }
+  .mobile .pricing-copy h2 { font-size: 24px; letter-spacing: -.4px; }
+  .mobile .cta-banner h2 { font-size: 22px; letter-spacing: -.4px; }
+  .mobile .chat-cta h2 { font-size: 20px; letter-spacing: -.4px; }
+}
+@media (max-width: 380px) {
+  .mobile .hero h1 { font-size: 26px; letter-spacing: -.4px; }
+  .mobile .section-head h2 { font-size: 22px; }
+  .mobile .pricing-copy h2 { font-size: 22px; }
+  .mobile .cta-banner h2 { font-size: 20px; }
+}
+
+/* Allow long German compound words ("Top-KI-Tools", "Premium-KI-Modelle")
+   to break gracefully instead of escaping past the viewport edge. */
+.mobile .hero h1,
+.mobile .section-head h2,
+.mobile .pricing-copy h2,
+.mobile .cta-banner h2,
+.mobile .chat-cta h2,
+.mobile .page-head h1 {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
 </style>
 </head>
 <body>
